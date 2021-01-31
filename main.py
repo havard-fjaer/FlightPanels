@@ -1,3 +1,4 @@
+from panels.radio_panel import RadioPanel
 import time
 import usb.core
 import usb.util as util
@@ -18,14 +19,15 @@ def monitor_device(dev, name, stop):
     dev.ctrl_transfer(outType, 0x09, 0x03, 0x00, data)
 
     # Read from endpoint
+    radio_panel = RadioPanel()
     while not stop():     
         try:
             # Endpoint: 0x81, Buffer: 3 bytes
             data = dev.read(0x81, 3)
-            print(name + " - " + str(data))
+            changed_buttons = radio_panel.update_button_state(data)
+            for cb in changed_buttons:
+                print(name +  ":" +  cb.name)
             time.sleep(0.01)
-        except KeyboardInterrupt:
-            break
         except usb.core.USBError as e:
             if e.backend_error_code == -116:
                 pass # Ignore timeouts when reading empty data
