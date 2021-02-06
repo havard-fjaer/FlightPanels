@@ -2,12 +2,14 @@ import usb.util as util
 from panels.panel_text_converter import *
 from panels.radio_panel_flag import *
 from panels.panel_base import *
-
-
 class RadioPanel(PanelBase):
-    
-    def __init__(self, stop, verbose, usbBus=None, usbAddress=None):
-        super().__init__(stop, verbose, 0x06a3, 0x0d05, usbBus, usbAddress)
+
+    USB_VENDOR = 0x06a3 # Logitech
+    USB_PRODUCT = 0x0d05 # Radio Panel
+
+    def __init__(self, usbBus=None, usbAddress=None, verbose=False):
+
+        super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usbBus, usbAddress, verbose)
         self.button_state = 0
         self.actionMapping = None
 
@@ -38,7 +40,7 @@ class RadioPanel(PanelBase):
     def update_button_state(self, state):
         changed_state = self.compare_to_button_state(state)
         changed_to_active = list()
-        for bf in RadioPanelButtonFlag:
+        for bf in RadioPanelFlag:
             if changed_state & bf.value != 0:
                 changed_to_active.append(bf)
         self.button_state = int.from_bytes(state, "big")

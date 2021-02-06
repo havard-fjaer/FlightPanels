@@ -4,8 +4,8 @@ import usb.core
 
 
 class PanelBase(object):
-    def __init__(self, stop, verbose, idVendor, idProduct, usbBus=None, usbAddress=None):
-        self.stop = stop
+    def __init__(self, idVendor, idProduct, usbBus=None, usbAddress=None, verbose=False):
+        self.stop = False
         self.verbose = verbose
         self.idVendor = idVendor
         self.idProduct = idProduct
@@ -14,6 +14,9 @@ class PanelBase(object):
         self.device = None
         self.device_is_ready = False
         self.connect()
+
+    def close(self):
+        self.stop = True
 
     def connect(self):
         devices = usb.core.find(idVendor=self.idVendor, idProduct=self.idProduct, find_all=True)
@@ -41,7 +44,7 @@ class PanelBase(object):
 
     def monitor_device(self):
         # Read from endpoint
-        while not self.stop():
+        while not self.stop:
             try:
                 self.read_from_device()  # Hook must be implemented in inheriting class!
                 time.sleep(0.01)

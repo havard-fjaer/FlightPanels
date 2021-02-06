@@ -1,5 +1,5 @@
 from enum import IntEnum, IntFlag
-class RadioPanelButtonFlag(IntFlag):
+class RadioPanelFlag(IntFlag):
     COM1_1 = 1 << 16
     COM2_1 = 2 << 16
     NAV1_1 = 4 << 16
