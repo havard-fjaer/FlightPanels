@@ -1,4 +1,4 @@
-from panels.panel_base import PanelBase
+from panels.radio_panel import RadioPanel
 import signal
 import sys
 import threading
@@ -24,12 +24,12 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    panel1 = PanelBase(lambda: stop, verbose, 0x06a3, 0x0d05, 0, 1)
-    panel1.run()
+    panel1 = RadioPanel(lambda: stop, verbose, usbBus=0, usbAddress=1)
+    panel1.connect()
     panel1.print_message("Test")
 
-    panel2 = PanelBase(lambda: stop, verbose, 0x06a3, 0x0d05, 0, 3)
-    panel2.run()
+    panel2 = RadioPanel(lambda: stop, verbose, usbBus=0, usbAddress=3)
+    panel2.connect()
 
     print('Press Ctrl+C to exit')
     while not stop:
