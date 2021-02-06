@@ -1,3 +1,4 @@
+from panels.radio_panel_flag import RadioPanelButtonFlag
 from panels.radio_panel import RadioPanel
 import signal
 import sys
@@ -15,7 +16,6 @@ def is_verbose():
     args = sys.argv[1:]
     return '-v' in args
 
-
 def main():
     global stop
     stop = False
@@ -24,11 +24,18 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    panel1 = RadioPanel(lambda: stop, verbose, usbBus=0, usbAddress=1)
+    actionMapping1 = {
+        RadioPanelButtonFlag.ENCODER_INNER_CW_1: lambda: print("Inner CW 1"),
+        RadioPanelButtonFlag.ENCODER_INNER_CCW_1: lambda: print("Inner CCW 1"),
+    }
+
+    print(actionMapping1)
+
+    panel1 = RadioPanel(lambda: stop, verbose, actionMapping1, usbBus=0, usbAddress=1)
     panel1.connect()
     panel1.print_message("Test")
 
-    panel2 = RadioPanel(lambda: stop, verbose, usbBus=0, usbAddress=3)
+    panel2 = RadioPanel(lambda: stop, verbose, actionMapping1, usbBus=0, usbAddress=3)
     panel2.connect()
 
     print('Press Ctrl+C to exit')

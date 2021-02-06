@@ -33,10 +33,10 @@ class PanelBase(object):
         print(message)
         device.set_configuration()
         self.device = device
-        self.device_is_ready = True
         thread = threading.Thread(target=self.monitor_device)
-        print(self.device_name() + " connected. Starting monitoring.")
         thread.start()
+        self.device_is_ready = True
+        print(self.device_name() + " connected. Starting monitoring.")
 
     def monitor_device(self):
         # Read from endpoint

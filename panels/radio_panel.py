@@ -4,9 +4,10 @@ from panels.panel_base import PanelBase
 
 
 class RadioPanel(PanelBase):
-    def __init__(self, stop, verbose, usbBus=None, usbAddress=None):
+    def __init__(self, stop, verbose, actionMapping, usbBus=None, usbAddress=None):
         super().__init__(stop, verbose, 0x06a3, 0x0d05, usbBus, usbAddress)
         self.button_state = 0
+        self.actionMapping = actionMapping
 
     def print_message(self, message):
         if not self.device_is_ready:
@@ -23,8 +24,10 @@ class RadioPanel(PanelBase):
         # Endpoint: 0x81, Buffer: 3 bytes
         data = self.device.read(0x81, 3)
         changed_buttons = self.update_button_state(data)
-        if self.verbose:
-            for cb in changed_buttons:
+        for cb in changed_buttons:
+            if cb in self.actionMapping.keys():
+                self.actionMapping[cb]()
+            if self.verbose:
                 print(self.device_name() + ":" + cb.name)
 
     def update_button_state(self, state):
