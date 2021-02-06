@@ -13,19 +13,15 @@ class RadioPanel(PanelBase):
         if not self.device_is_ready:
             print("Device is not ready yet.")
             return
-        # Send control message
-        #           0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19
-        data = b'\xd4\x01\x0f\xd3\x04\x00\x01\x02\x03\x04\x00\x01\x02\x03\x04\x00\x01\x02\x03\x04'
-        outType = util.build_request_type(
-            util.CTRL_OUT, util.CTRL_TYPE_CLASS, util.CTRL_RECIPIENT_INTERFACE)  # 0x21
-        self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, data)
+        outType = util.build_request_type(util.CTRL_OUT, util.CTRL_TYPE_CLASS, util.CTRL_RECIPIENT_INTERFACE)  # 0x21
+        self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, message)
 
     def read_from_device(self):
         # Endpoint: 0x81, Buffer: 3 bytes
         data = self.device.read(0x81, 3)
         changed_buttons = self.update_button_state(data)
         for cb in changed_buttons:
-            if cb in self.actionMapping.keys():
+            if self.actionMapping != None and cb in self.actionMapping.keys():
                 self.actionMapping[cb]()
             if self.verbose:
                 print(self.device_name() + ":" + cb.name)

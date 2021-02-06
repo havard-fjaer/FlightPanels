@@ -4,7 +4,7 @@ import panels.radio_panel
 class TestStringMethods(unittest.TestCase):
   
     def test_show_state_change(self):
-        radio = panels.radio_panel.RadioPanel()
+        radio = panels.radio_panel.RadioPanel(False, True, None)
 
         intital_state_bytes = b'\x00\x00\x10'
         radio.update_button_state(intital_state_bytes)

@@ -1,5 +1,6 @@
-from panels.radio_panel_flag import RadioPanelButtonFlag
 from panels.radio_panel import RadioPanel
+from panels.radio_panel_flag import RadioPanelButtonFlag
+from panels.panel_text_converter import PanelTextConverter
 import signal
 import sys
 import threading
@@ -33,10 +34,12 @@ def main():
 
     panel1 = RadioPanel(lambda: stop, verbose, actionMapping1, usbBus=0, usbAddress=1)
     panel1.connect()
-    panel1.print_message("Test")
+    lcd = PanelTextConverter()
+    panel1.print_message(lcd.convert_string_to_bytes("12345123451234512345"))
 
     panel2 = RadioPanel(lambda: stop, verbose, actionMapping1, usbBus=0, usbAddress=3)
     panel2.connect()
+    panel2.print_message(lcd.convert_string_to_bytes("1.2 4.5-12.34  123 123"))
 
     print('Press Ctrl+C to exit')
     while not stop:
