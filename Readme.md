@@ -1,5 +1,5 @@
 # High level device driver for Logitech / Saitek Flight Panels
-Based on the documentation compiled by Björn Andersson https://github.com/bjanders/fpanels
+Based on the documentation compiled by Björn Andersson (https://github.com/bjanders/fpanels)
 
 ## Status
 - Work in progress. The base communication is established, but needs more work before it works fully in a flight simulator.
