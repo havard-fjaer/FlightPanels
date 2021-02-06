@@ -7,7 +7,7 @@ def is_verbose():
     return '-v' in args
 
 def create_radio_panel_1():
-    panel1 = RadioPanel(usbBus=0, usbAddress=1, verbose=is_verbose())
+    panel1 = RadioPanel(usb_bus=0, usb_address=1, verbose=is_verbose())
     if panel1.device_is_ready:
         panel1.map_actions({
             RadioPanelFlag.ENCODER_INNER_CW_1: lambda: print("Inner CW 1 - dev1"),
@@ -19,7 +19,7 @@ def create_radio_panel_1():
     return panel1
 
 def create_radio_panel_2():
-    panel2 = RadioPanel(usbBus=0, usbAddress=2, verbose=is_verbose())
+    panel2 = RadioPanel(usb_bus=0, usb_address=2, verbose=is_verbose())
     if panel2.device_is_ready:
         panel2.map_actions({
             RadioPanelFlag.ENCODER_INNER_CW_1: lambda: panel2.set_lcd(RadioPanelLcd.LCD1, "11111111111111111111"),

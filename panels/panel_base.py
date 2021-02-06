@@ -4,13 +4,13 @@ import usb.core
 
 
 class PanelBase(object):
-    def __init__(self, idVendor, idProduct, usbBus=None, usbAddress=None, verbose=False):
+    def __init__(self, id_vendor, id_product, usb_bus=None, usb_address=None, verbose=False):
         self.stop = False
         self.verbose = verbose
-        self.idVendor = idVendor
-        self.idProduct = idProduct
-        self.usbBus = usbBus
-        self.usbAddress = usbAddress
+        self.id_vendor = id_vendor
+        self.id_product = id_product
+        self.usb_bus = usb_bus
+        self.usb_address = usb_address
         self.device = None
         self.device_is_ready = False
         self.connect()
@@ -19,14 +19,14 @@ class PanelBase(object):
         self.stop = True
 
     def connect(self):
-        devices = usb.core.find(idVendor=self.idVendor, idProduct=self.idProduct, find_all=True)
+        devices = usb.core.find(idVendor=self.id_vendor, idProduct=self.id_product, find_all=True)
         for device in devices:
             if device is not None:
-                if self.usbBus == device.bus and self.usbAddress == device.address:
+                if self.usb_bus == device.bus and self.usb_address == device.address:
                     self.connect_device(
                         device, "Connecting to specified USB device: " + self.device_name(device))
                     return
-                elif self.usbBus == None or self.usbAddress == None:
+                elif self.usb_bus == None or self.usb_address == None:
                     self.connect_device(
                         device, "Connecting to first available USB device: " + self.device_name(device))
                     return
@@ -37,6 +37,8 @@ class PanelBase(object):
         print(message)
         device.set_configuration()
         self.device = device
+        if self.verbose:
+            print(device)        
         thread = threading.Thread(target=self.monitor_device)
         thread.start()
         self.device_is_ready = True

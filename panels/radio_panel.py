@@ -7,17 +7,17 @@ class RadioPanel(PanelBase):
     USB_VENDOR = 0x06a3 # Logitech
     USB_PRODUCT = 0x0d05 # Radio Panel
 
-    def __init__(self, usbBus=None, usbAddress=None, verbose=False):
+    def __init__(self, usb_bus=None, usb_address=None, verbose=False):
 
-        super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usbBus, usbAddress, verbose)
+        super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
         self.button_state = 0
-        self.actionMapping = None
+        self.action_mapping = None
 
-    def map_actions(self, actionMapping):
-        self.actionMapping = actionMapping
+    def map_actions(self, action_mapping):
+        self.action_mapping = action_mapping
 
     def set_lcd(self, lcd, str):
-        lcd.value
+        lcd.value # TODO
         self.display_state = str
         self.update_displays()
 
@@ -32,8 +32,8 @@ class RadioPanel(PanelBase):
         data = self.device.read(0x81, 3)
         changed_buttons = self.update_button_state(data)
         for cb in changed_buttons:
-            if self.actionMapping != None and cb in self.actionMapping.keys():
-                self.actionMapping[cb]()
+            if self.action_mapping != None and cb in self.action_mapping.keys():
+                self.action_mapping[cb]()
             if self.verbose:
                 print(self.device_name() + ":" + cb.name)
 
