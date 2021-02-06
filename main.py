@@ -24,8 +24,12 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    panel = PanelBase(lambda: stop, verbose, 0x06a3, 0x0d05)
-    panel.run()
+    panel1 = PanelBase(lambda: stop, verbose, 0x06a3, 0x0d05, 0, 1)
+    panel1.run()
+    panel1.print_message("Test")
+
+    panel2 = PanelBase(lambda: stop, verbose, 0x06a3, 0x0d05, 0, 3)
+    panel2.run()
 
     print('Press Ctrl+C to exit')
     while not stop:
