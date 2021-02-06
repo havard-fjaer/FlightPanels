@@ -1,20 +1,29 @@
 import usb.util as util
-from panels.radio_panel_flag import RadioPanelButtonFlag
-from panels.panel_base import PanelBase
+from panels.panel_text_converter import *
+from panels.radio_panel_flag import *
+from panels.panel_base import *
 
 
 class RadioPanel(PanelBase):
-    def __init__(self, stop, verbose, actionMapping, usbBus=None, usbAddress=None):
+    
+    def __init__(self, stop, verbose, usbBus=None, usbAddress=None):
         super().__init__(stop, verbose, 0x06a3, 0x0d05, usbBus, usbAddress)
         self.button_state = 0
+        self.actionMapping = None
+
+    def map_actions(self, actionMapping):
         self.actionMapping = actionMapping
 
-    def print_message(self, message):
-        if not self.device_is_ready:
-            print("Device is not ready yet.")
-            return
+    def set_lcd(self, lcd, str):
+        lcd.value
+        self.display_state = str
+        self.update_displays()
+
+
+    def update_displays(self):
+        text_bytes = convert_string_to_bytes(self.display_state)
         outType = util.build_request_type(util.CTRL_OUT, util.CTRL_TYPE_CLASS, util.CTRL_RECIPIENT_INTERFACE)  # 0x21
-        self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, message)
+        self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, text_bytes)
 
     def read_from_device(self):
         # Endpoint: 0x81, Buffer: 3 bytes
@@ -27,7 +36,6 @@ class RadioPanel(PanelBase):
                 print(self.device_name() + ":" + cb.name)
 
     def update_button_state(self, state):
-
         changed_state = self.compare_to_button_state(state)
         changed_to_active = list()
         for bf in RadioPanelButtonFlag:

@@ -11,11 +11,12 @@ class PanelBase(object):
         self.idProduct = idProduct
         self.usbBus = usbBus
         self.usbAddress = usbAddress
+        self.device = None
         self.device_is_ready = False
+        self.connect()
 
     def connect(self):
-        devices = usb.core.find(idVendor=self.idVendor,
-                                idProduct=self.idProduct, find_all=True)
+        devices = usb.core.find(idVendor=self.idVendor, idProduct=self.idProduct, find_all=True)
         for device in devices:
             if device is not None:
                 if self.usbBus == device.bus and self.usbAddress == device.address:

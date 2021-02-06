@@ -1,4 +1,4 @@
-from enum import IntFlag
+from enum import IntEnum, IntFlag
 class RadioPanelButtonFlag(IntFlag):
     COM1_1 = 1 << 16
     COM2_1 = 2 << 16
@@ -24,3 +24,10 @@ class RadioPanelButtonFlag(IntFlag):
     ENCODER_INNER_CCW_2 = 32
     ENCODER_OUTER_CW_2 = 64
     ENCODER_OUTER_CCW_2 = 128
+
+class RadioPanelLcd(IntEnum):
+    # Byte offsets per LCD
+    LCD1 = 0
+    LCD2 = 5
+    LCD3 = 10
+    LCD4 = 15
