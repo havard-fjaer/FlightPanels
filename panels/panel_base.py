@@ -4,6 +4,12 @@ import usb.core
 
 
 class PanelBase(object):
+    """
+    Finds and connects to specified USB devices. 
+    Monitors each device in a separate thread.
+    Usage: Inherit class, and implement self.read_from_device() to react to USB events.
+    Note: Updating displays must be implemented in the inheriting class, using calls to self.device.ctrl_transfer()
+    """    
     def __init__(self, id_vendor, id_product, usb_bus=None, usb_address=None, verbose=False):
         self.stop = False
         self.verbose = verbose
@@ -16,9 +22,12 @@ class PanelBase(object):
         self.connect()
 
     def close(self):
-        self.stop = True
+        self.stop = True  
 
     def connect(self):
+        """
+        Finds and connects to a specified device, or the first device for a given vendor and product.
+        """
         devices = usb.core.find(idVendor=self.id_vendor, idProduct=self.id_product, find_all=True)
         for device in devices:
             if device is not None:
@@ -34,6 +43,9 @@ class PanelBase(object):
                     print(self.device_name(device) + " skipped.")
 
     def connect_device(self, device, message):
+        """
+        Connects, starts and spins up a thread for listening to the device.
+        """
         print(message)
         device.set_configuration()
         self.device = device
@@ -44,7 +56,11 @@ class PanelBase(object):
         self.device_is_ready = True
         print(self.device_name() + " connected. Starting monitoring.")
 
+
     def monitor_device(self):
+        """
+        Loops over the device, calling self.read_from_device() to read any new data using self.device.read().
+        """        
         # Read from endpoint
         while not self.stop:
             try:

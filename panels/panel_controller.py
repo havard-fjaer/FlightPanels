@@ -3,7 +3,9 @@ import time
 
 
 class PanelController():
-
+    """
+    Keeps the application alive, controls the panels, and terminates their threads on Ctrl-C.
+    """
     def __init__(self):
         self.panels = list()
         self.is_active = True

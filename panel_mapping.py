@@ -1,3 +1,6 @@
+"""
+Demo mapping of actions to panel events. Implement something similar in your own application.
+"""
 import sys
 from panels.radio_panel import RadioPanel
 from panels.radio_panel_flag import *

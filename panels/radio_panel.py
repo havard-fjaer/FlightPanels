@@ -3,7 +3,11 @@ from panels.panel_text_converter import *
 from panels.radio_panel_flag import *
 from panels.panel_base import *
 class RadioPanel(PanelBase):
-
+    """
+    Logic specific to Radio Panel:
+    - Implementing reading and converting button states, 
+    - Passing and converting strings to bytes, updating the LED displays.
+    """
     USB_VENDOR = 0x06a3 # Logitech
     USB_PRODUCT = 0x0d05 # Radio Panel
 
@@ -23,11 +27,18 @@ class RadioPanel(PanelBase):
 
 
     def update_displays(self):
+        """
+        Converts strings to radio panel bytes, and updates the displays.
+        """
         text_bytes = convert_string_to_bytes(self.display_state)
         outType = util.build_request_type(util.CTRL_OUT, util.CTRL_TYPE_CLASS, util.CTRL_RECIPIENT_INTERFACE)  # 0x21
         self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, text_bytes)
 
     def read_from_device(self):
+        """
+        Reads from the device, and triggers any mapped 
+        actions corresponding to buttons that have changed.
+        """
         # Endpoint: 0x81, Buffer: 3 bytes
         data = self.device.read(0x81, 3)
         changed_buttons = self.update_button_state(data)
@@ -37,7 +48,12 @@ class RadioPanel(PanelBase):
             if self.verbose:
                 print(self.device_name() + ":" + cb.name)
 
+
     def update_button_state(self, state):
+        """
+        Goes through the changed button bits in the radio panel, 
+        and returns the corresponding RadioPanelFlags
+        """
         changed_state = self.compare_to_button_state(state)
         changed_to_active = list()
         for bf in RadioPanelFlag:
@@ -47,6 +63,9 @@ class RadioPanel(PanelBase):
         return changed_to_active
 
     def compare_to_button_state(self, state):
+        """
+        Identifies changed bits, and returns the newly active ones.
+        """
         new_state = int.from_bytes(state, "big")
         old_state = self.button_state
 
