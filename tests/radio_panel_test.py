@@ -12,7 +12,7 @@ class TestStringMethods(unittest.TestCase):
         initial_state = radio.bit_state
         
         new_state_bytes = b'\x00\x00\x01'
-        state_change = radio.calculate_changed_state(convert_bytes_to_int(new_state_bytes))
+        state_change = bit_change(initial_state, convert_bytes_to_int(new_state_bytes))
         new_state = int.from_bytes(new_state_bytes, "big")
 
         print("Initial state: " + format(initial_state, '024b'))

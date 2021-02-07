@@ -7,7 +7,7 @@ from panels.panel_base import *
 class RadioPanel(PanelBase):
     """
     Logic specific to Radio Panel:
-    - Implementing reading and converting button states, 
+    - Implementing reading and converting USB bit states, 
     - Passing and converting strings to bytes, updating the LED displays.
     """
     USB_VENDOR = 0x06a3  # Logitech
@@ -20,7 +20,7 @@ class RadioPanel(PanelBase):
         super().__init__(RadioPanel.USB_VENDOR,
                          RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
         self.event_handlers = None # Exposes all bit changes
-        self.state_handler = None  # Exposes radio states when changed
+        self.radio_state_handler = None  # Exposes radio states when changed
         self.bit_state = 0
         self.radio1_state = None
         self.radio2_state = None
@@ -42,8 +42,8 @@ class RadioPanel(PanelBase):
     def set_event_handlers(self, event_handlers):
         self.event_handlers = event_handlers()
 
-    def set_state_handler(self, state_handler): 
-        self.state_handler = state_handler
+    def set_radio_state_handler(self, radio_state_handler): 
+        self.radio_state_handler = radio_state_handler
 
     def set_lcd(self, lcd, str):
         self.lcd_state[lcd] = str
@@ -83,46 +83,37 @@ class RadioPanel(PanelBase):
     def read_from_device(self):
         """
         Reads from the device, and triggers any mapped 
-        actions corresponding to buttons that have changed.
+        events corresponding to bits that have changed.
         """
         # Endpoint: 0x81, Buffer: 3 bytes
         new_byte_state = self.device.read(0x81, 3)
         new_bit_state = convert_bytes_to_int(new_byte_state)
-        changed_states = self.calculate_changed_state(new_bit_state)
-        self.trigger_event_handlers(changed_states)
-        self.trigger_state_handler(new_bit_state)
+        changed_bit_state = bit_change(self.bit_state, new_bit_state)
+        self.trigger_event_handlers(changed_bit_state)
+        self.trigger_radio_state_handler(new_bit_state)
         self.update_bit_state(new_bit_state)
 
-    def calculate_changed_state(self, new_bit_state):
-        """
-        Identifies changed bits, and returns the newly active ones.
-        """
-        changed_state = (
-            new_bit_state ^ self.bit_state  # XOR for checking change
-            & new_bit_state  # and AND to return only active bits
-        )
-        return changed_state
 
     def trigger_event_handlers(self, changed_state):
-        event_flags = convert_bits_to_flags(changed_state)
-        for cb in event_flags:
-            if self.event_handlers != None and cb in self.event_handlers.keys():
-                self.event_handlers[cb]()
+        changed_flags = convert_bits_to_flags(changed_state)
+        for flag in changed_flags:
+            if self.event_handlers != None and flag in self.event_handlers.keys():
+                self.event_handlers[flag]()
             if self.verbose:
-                print(self.device_name() + ":" + cb.name)
+                print(self.device_name() + ":" + flag.name)
 
-    def trigger_state_handler(self, new_bit_state):
-        if self.state_handler is None:
+    def trigger_radio_state_handler(self, new_bit_state):
+        if self.radio_state_handler is None:
             return
 
         new_radio1_state = None
         new_radio2_state = None
-        new_button_state = convert_bits_to_flags(new_bit_state)
-        for button in new_button_state:
-            if RadioPanelFlag.is_radio1_state(button):
-                new_radio1_state = button
-            if RadioPanelFlag.is_radio2_state(button):
-                new_radio2_state = button
+        active_flags = convert_bits_to_flags(new_bit_state)
+        for flag in active_flags:
+            if RadioPanelFlag.is_radio1_flag(flag):
+                new_radio1_state = flag
+            if RadioPanelFlag.is_radio2_flag(flag):
+                new_radio2_state = flag
 
         # Trigger handler if any radio has changed state
         radio1_changed = new_radio1_state is not self.radio1_state
@@ -130,17 +121,28 @@ class RadioPanel(PanelBase):
         if (radio1_changed or radio2_changed):
             self.radio1_state = new_radio1_state
             self.radio2_state = new_radio2_state
-            self.state_handler(new_radio1_state, new_radio2_state)
+            self.radio_state_handler(new_radio1_state, new_radio2_state)
 
     def update_bit_state(self, new_bit_state):
         self.bit_state = new_bit_state
 
 def convert_bits_to_flags(bits):
-    buttons = list()
-    for bf in RadioPanelFlag:
-        if bits & bf.value != 0:
-            buttons.append(bf)
-    return buttons
+    flags = list()
+    for flag in RadioPanelFlag:
+        if bits & flag.value != 0:
+            flags.append(flag)
+    return flags
 
 def convert_bytes_to_int(bytes):
     return int.from_bytes(bytes, "big")
+
+
+def bit_change(old_bits, new_bits):
+    """
+    Identifies changed bits, and returns the newly active ones.
+    """
+    changed_bits = (
+        new_bits ^ old_bits  # XOR for checking change
+        & new_bits  # and AND to return only active bits
+    )
+    return changed_bits

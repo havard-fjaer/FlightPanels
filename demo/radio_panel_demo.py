@@ -17,7 +17,7 @@ class RadioPanelDemoService:
         self.panel = panel
         self.panel.clear_lcd()
         self.panel.set_event_handlers(self.event_handlers)
-        self.panel.set_state_handler(self.state_handler)
+        self.panel.set_radio_state_handler(self.radio_state_handler)
 
     def event_handlers(self):
         return {
@@ -26,7 +26,7 @@ class RadioPanelDemoService:
             RadioPanelFlag.ENCODER_INNER_CW_1: lambda: print("Inner CW 1 - dev1"),
         }
 
-    def state_handler(self, radio1_state, radio2_state):
+    def radio_state_handler(self, radio1_state, radio2_state):
         print("Radio 1: " + radio1_state.name)
         print("Radio 2: " + radio2_state.name)
 

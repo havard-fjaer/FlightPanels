@@ -3,10 +3,10 @@ from enum import IntEnum, IntFlag
 
 class RadioPanelFlag(IntFlag):
 
-    def is_radio1_state(state):
+    def is_radio1_flag(state):
         return is_radiox_state(state, radio1_states())
 
-    def is_radio2_state(state):
+    def is_radio2_flag(state):
         return is_radiox_state(state, radio2_states())
 
     COM1_1 = 1 << 16
