@@ -15,6 +15,7 @@ class RadioPanelDemoService:
         print("Closing Radio Panel Demo Service.")
         self.stopwatch1.close()
         self.stopwatch2.close()
+        self.number1.close()
         self.is_closing = True
 
     def connect_panel(self, panel):
