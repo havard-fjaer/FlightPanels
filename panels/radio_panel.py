@@ -87,8 +87,8 @@ class RadioPanel(PanelBase):
         """
         # Endpoint: 0x81, Buffer: 3 bytes
         new_byte_state = self.device.read(0x81, 3)
-        new_bit_state = convert_bytes_to_int(new_byte_state)
-        changed_bit_state = bit_change(self.bit_state, new_bit_state)
+        new_bit_state = convert_bytes_to_int(new_byte_state)          # All active bits
+        changed_bit_state = bit_change(self.bit_state, new_bit_state) # Only changed active bits, compared to the previous read
         self.trigger_event_handlers(changed_bit_state)
         self.trigger_radio_state_handler(new_bit_state)
         self.update_bit_state(new_bit_state)
@@ -98,7 +98,7 @@ class RadioPanel(PanelBase):
         changed_flags = convert_bits_to_flags(changed_state)
         for flag in changed_flags:
             if self.event_handlers != None and flag in self.event_handlers.keys():
-                self.event_handlers[flag]()
+                self.event_handlers[flag]() # Call handler configured externally (Dictionary mapping Flags to Handlers)
             if self.verbose:
                 print(self.device_name() + ":" + flag.name)
 
@@ -121,7 +121,7 @@ class RadioPanel(PanelBase):
         if (radio1_changed or radio2_changed):
             self.radio1_state = new_radio1_state
             self.radio2_state = new_radio2_state
-            self.radio_state_handler(new_radio1_state, new_radio2_state)
+            self.radio_state_handler(new_radio1_state, new_radio2_state) # Call handler configured externally
 
     def update_bit_state(self, new_bit_state):
         self.bit_state = new_bit_state
