@@ -20,6 +20,11 @@ class RadioPanelDemoService:
             RadioPanelFlag.ACT_STDBY_1: self.toggle_stop_watch,
             RadioPanelFlag.ENCODER_INNER_CCW_1: lambda: print("Inner CCW 1 - dev1"),
         })
+        self.panel.state_change_handler = self.state_change_handler
+
+    def state_change_handler(self, radio1_state, radio2_state):
+        print("Radio 1: " + radio1_state.name)
+        print("Radio 2: " + radio2_state.name)
 
     def toggle_stop_watch(self):
         self.stopwatch.display = self.panel.set_lcd1

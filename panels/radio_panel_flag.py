@@ -1,5 +1,14 @@
 from enum import IntEnum, IntFlag
+
+
 class RadioPanelFlag(IntFlag):
+
+    def is_radio1_state(state):
+        return is_radiox_state(state, radio1_states())
+
+    def is_radio2_state(state):
+        return is_radiox_state(state, radio2_states())
+
     COM1_1 = 1 << 16
     COM2_1 = 2 << 16
     NAV1_1 = 4 << 16
@@ -15,15 +24,47 @@ class RadioPanelFlag(IntFlag):
     DME_2 = 16 << 8
     XPDR_2 = 32 << 8
     ACT_STDBY_1 = 64 << 8
-    ACT_STDBY_2  = 128 << 8
+    ACT_STDBY_2 = 128 << 8
     ENCODER_INNER_CW_1 = 1
     ENCODER_INNER_CCW_1 = 2
     ENCODER_OUTER_CW_1 = 4
-    ENCODER_OUTER_CCW_1 = 8    
+    ENCODER_OUTER_CCW_1 = 8
     ENCODER_INNER_CW_2 = 16
     ENCODER_INNER_CCW_2 = 32
     ENCODER_OUTER_CW_2 = 64
     ENCODER_OUTER_CCW_2 = 128
+
+
+def radio1_states():
+    return {
+        RadioPanelFlag.COM1_1,
+        RadioPanelFlag.COM2_1,
+        RadioPanelFlag.NAV1_1,
+        RadioPanelFlag.NAV2_1,
+        RadioPanelFlag.ADF_1,
+        RadioPanelFlag.DME_1,
+        RadioPanelFlag.XPDR_1
+    }
+
+
+def radio2_states():
+    return {
+        RadioPanelFlag.COM1_2,
+        RadioPanelFlag.COM2_2,
+        RadioPanelFlag.NAV1_2,
+        RadioPanelFlag.NAV2_2,
+        RadioPanelFlag.ADF_2,
+        RadioPanelFlag.DME_2,
+        RadioPanelFlag.XPDR_2
+    }
+
+
+def is_radiox_state(state, radiox_states):
+    for s in radiox_states:
+        if s == state:
+            return True
+    return False
+
 
 class RadioPanelLcd(IntEnum):
     # Byte offsets per LCD

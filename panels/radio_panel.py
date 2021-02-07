@@ -14,10 +14,11 @@ class RadioPanel(PanelBase):
     LCD_BLANK = "     "
     LCD_DASHES = "-----"
 
-    def __init__(self, service, usb_bus=None, usb_address=None, verbose=True):
+    def __init__(self, service, usb_bus=None, usb_address=None, verbose=False):
         super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
         self.action_mapping = None
-        self.button_state = 0
+        self.state_change_handler = None
+        self.bit_state = 0
         self.lcd = {
             RadioPanelLcd.LCD1: RadioPanel.LCD_DASHES,
             RadioPanelLcd.LCD2: RadioPanel.LCD_DASHES,
@@ -78,36 +79,61 @@ class RadioPanel(PanelBase):
         """
         # Endpoint: 0x81, Buffer: 3 bytes
         data = self.device.read(0x81, 3)
-        changed_buttons = self.update_button_state(data)
+        changed_buttons = self.update_state(data)
         for cb in changed_buttons:
             if self.action_mapping != None and cb in self.action_mapping.keys():
                 self.action_mapping[cb]()
+            
             if self.verbose:
                 print(self.device_name() + ":" + cb.name)
 
+    def submit_state(self, buttons):
+        if self.state_change_handler is None:
+            return
+        radio1_state = None
+        radio2_state = None
+        for button in buttons:
+            if RadioPanelFlag.is_radio1_state(button):
+                radio1_state = button
+            if RadioPanelFlag.is_radio2_state(button):
+                radio2_state = button
+        self.state_change_handler(radio1_state, radio2_state)
+    
+    
+    #def current_state_buttons(self):
 
-    def update_button_state(self, state):
+
+    def update_state(self, new_byte_state):
         """
         Goes through the changed button bits in the radio panel, 
         and returns the corresponding RadioPanelFlags
         """
-        changed_state = self.compare_to_button_state(state)
-        changed_to_active = list()
-        for bf in RadioPanelFlag:
-            if changed_state & bf.value != 0:
-                changed_to_active.append(bf)
-        self.button_state = int.from_bytes(state, "big")
-        return changed_to_active
+        new_bit_state = convert_bytes_to_int(new_byte_state)
+        self.submit_state(convert_bits_to_buttons(new_bit_state))
 
-    def compare_to_button_state(self, state):
+        changed_state = self.compare_to_previous_state(new_bit_state)
+        changed_buttons=convert_bits_to_buttons(changed_state)        
+        self.bit_state = new_bit_state
+        return changed_buttons
+
+    def compare_to_previous_state(self, new_state):
         """
         Identifies changed bits, and returns the newly active ones.
         """
-        new_state = int.from_bytes(state, "big")
-        old_state = self.button_state
+        old_state = self.bit_state
 
         changed_state = (
             new_state ^ old_state  # XOR for checking change
             & new_state  # and AND to return only active bits
         )
         return changed_state
+
+def convert_bits_to_buttons(bits):
+    buttons = list()
+    for bf in RadioPanelFlag:
+        if bits & bf.value != 0:
+            buttons.append(bf)
+    return buttons
+
+def convert_bytes_to_int(bytes):
+    return int.from_bytes(bytes, "big")
