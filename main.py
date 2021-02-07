@@ -4,8 +4,8 @@ from demo.radio_panel_demo import RadioPanelDemoService
 
 def main():
     panel_controller = PanelController()
-    panel_controller.append(RadioPanel(RadioPanelDemoService(), usb_bus=0, usb_address=1))
-    panel_controller.append(RadioPanel(RadioPanelDemoService(), usb_bus=0, usb_address=2))
+    panel_controller.append(RadioPanel(RadioPanelDemoService(), usb_bus=0, usb_address=3))
+    panel_controller.append(RadioPanel(RadioPanelDemoService(), usb_bus=0, usb_address=4))
     panel_controller.start_all()
     panel_controller.wait()
 

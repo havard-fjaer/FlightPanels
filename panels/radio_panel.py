@@ -18,6 +18,12 @@ class RadioPanel(PanelBase):
         self.service = service
         self.service.connect_panel(self)
         self.button_state = 0
+        self.lcd = {
+            RadioPanelLcd.LCD1: "-----",
+            RadioPanelLcd.LCD2: "-----",
+            RadioPanelLcd.LCD3: "-----",
+            RadioPanelLcd.LCD4: "-----",
+        }
 
     def close(self):
         PanelBase.close(self)
@@ -27,16 +33,22 @@ class RadioPanel(PanelBase):
         self.action_mapping = action_mapping
 
     def set_lcd(self, lcd, str):
-        lcd.value # TODO
-        self.display_state = str
+        self.lcd[lcd] = str
         self.update_displays()
+
+
+    def set_lcd1(self, str):
+        self.set_lcd(RadioPanelLcd.LCD1, str)
 
 
     def update_displays(self):
         """
         Converts strings to radio panel bytes, and updates the displays.
         """
-        text_bytes = convert_string_to_bytes(self.display_state)
+        display_state = ""
+        for value in self.lcd.values():
+            display_state += value
+        text_bytes = convert_string_to_bytes(display_state)
         outType = util.build_request_type(util.CTRL_OUT, util.CTRL_TYPE_CLASS, util.CTRL_RECIPIENT_INTERFACE)  # 0x21
         self.device.ctrl_transfer(outType, 0x09, 0x03, 0x00, text_bytes)
 
