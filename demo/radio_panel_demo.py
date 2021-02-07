@@ -16,13 +16,17 @@ class RadioPanelDemoService:
     def connect_panel(self, panel):
         self.panel = panel
         self.panel.clear_lcd()
-        self.panel.map_actions({
+        self.panel.set_event_handlers(self.event_handlers)
+        self.panel.set_state_handler(self.state_handler)
+
+    def event_handlers(self):
+        return {
             RadioPanelFlag.ACT_STDBY_1: self.toggle_stop_watch,
             RadioPanelFlag.ENCODER_INNER_CCW_1: lambda: print("Inner CCW 1 - dev1"),
-        })
-        self.panel.state_change_handler = self.state_change_handler
+            RadioPanelFlag.ENCODER_INNER_CW_1: lambda: print("Inner CW 1 - dev1"),
+        }
 
-    def state_change_handler(self, radio1_state, radio2_state):
+    def state_handler(self, radio1_state, radio2_state):
         print("Radio 1: " + radio1_state.name)
         print("Radio 2: " + radio2_state.name)
 
