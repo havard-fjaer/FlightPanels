@@ -1,4 +1,3 @@
-import threading
 import time
 import usb.core
 
@@ -6,7 +5,6 @@ import usb.core
 class PanelBase(object):
     """
     Finds and connects to specified USB devices. 
-    Monitors each device in a separate thread.
     Usage: Inherit class, and implement self.read_from_device() to react to USB events.
     Note: Updating displays must be implemented in the inheriting class, using calls to self.device.ctrl_transfer()
     """    
@@ -51,8 +49,6 @@ class PanelBase(object):
         self.device = device
         if self.verbose:
             print(device)        
-        thread = threading.Thread(target=self.monitor_device)
-        thread.start()
         self.device_is_ready = True
         print(self.device_name() + " connected. Starting monitoring.")
 

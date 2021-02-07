@@ -1,12 +1,14 @@
 import signal
 import sys
 import time
+import threading
 
 
 class PanelController():
     """
     Keeps the application alive, controls the panels, and terminates their threads on Ctrl-C.
     """
+
     def __init__(self):
         self.panels = list()
         self.is_active = True
@@ -15,6 +17,13 @@ class PanelController():
 
     def append(self, panel):
         self.panels.append(panel(is_verbose()))
+
+    def start_all(self):
+        for p in self.panels:
+            p.connect()
+            if p.device_is_ready:
+                thread = threading.Thread(target=p.monitor_device)
+                thread.start()
 
     def wait(self):
         print('Press Ctrl+C to exit')
@@ -27,9 +36,11 @@ class PanelController():
             p.close()
 
     def handle_close_signal(self, sig, frame):
-        print("{0} received. Stopping threads.".format(signal.Signals(sig).name))
+        print("{0} received. Stopping threads.".format(
+            signal.Signals(sig).name))
         self.close_all()
-    
+
+
 def is_verbose():
     args = sys.argv[1:]
     return '-v' in args

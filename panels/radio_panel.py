@@ -11,7 +11,7 @@ class RadioPanel(PanelBase):
     USB_VENDOR = 0x06a3 # Logitech
     USB_PRODUCT = 0x0d05 # Radio Panel
 
-    def __init__(self, usb_bus=None, usb_address=None, verbose=False):
+    def __init__(self, usb_bus=None, usb_address=None, verbose=True):
 
         super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
         self.button_state = 0
