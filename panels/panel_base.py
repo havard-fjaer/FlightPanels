@@ -9,7 +9,7 @@ class PanelBase(object):
     Note: Updating displays must be implemented in the inheriting class, using calls to self.device.ctrl_transfer()
     """    
     def __init__(self, id_vendor, id_product, usb_bus=None, usb_address=None, verbose=False):
-        self.stop = False
+        self.is_closing = False
         self.verbose = verbose
         self.id_vendor = id_vendor
         self.id_product = id_product
@@ -21,7 +21,7 @@ class PanelBase(object):
 
     def close(self):
         print("Closing " + self.device_name())
-        self.stop = True  
+        self.is_closing = True  
 
     def connect(self):
         """
@@ -59,7 +59,7 @@ class PanelBase(object):
         Loops over the device, calling self.read_from_device() to read any new data using self.device.read().
         """        
         # Read from endpoint
-        while not self.stop:
+        while not self.is_closing:
             try:
                 self.read_from_device()  # Hook must be implemented in inheriting class!
                 time.sleep(0.01)

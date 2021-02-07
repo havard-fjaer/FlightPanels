@@ -11,19 +11,23 @@ class RadioPanel(PanelBase):
     USB_VENDOR = 0x06a3 # Logitech
     USB_PRODUCT = 0x0d05 # Radio Panel
 
-    def __init__(self, service, usb_bus=None, usb_address=None, verbose=True):
+    LCD_BLANK = "     "
+    LCD_DASHES = "-----"
 
+    def __init__(self, service, usb_bus=None, usb_address=None, verbose=True):
         super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
         self.action_mapping = None
-        self.service = service
-        self.service.connect_panel(self)
         self.button_state = 0
         self.lcd = {
-            RadioPanelLcd.LCD1: "-----",
-            RadioPanelLcd.LCD2: "-----",
-            RadioPanelLcd.LCD3: "-----",
-            RadioPanelLcd.LCD4: "-----",
+            RadioPanelLcd.LCD1: RadioPanel.LCD_DASHES,
+            RadioPanelLcd.LCD2: RadioPanel.LCD_DASHES,
+            RadioPanelLcd.LCD3: RadioPanel.LCD_DASHES,
+            RadioPanelLcd.LCD4: RadioPanel.LCD_DASHES,
         }
+        # Connect service only after panel is initialized
+        self.service = service
+        self.service.connect_panel(self)
+
 
     def close(self):
         PanelBase.close(self)
@@ -36,9 +40,24 @@ class RadioPanel(PanelBase):
         self.lcd[lcd] = str
         self.update_displays()
 
+    def clear_lcd(self):
+        self.lcd[RadioPanelLcd.LCD1] = RadioPanel.LCD_BLANK
+        self.lcd[RadioPanelLcd.LCD2] = RadioPanel.LCD_BLANK
+        self.lcd[RadioPanelLcd.LCD3] = RadioPanel.LCD_BLANK
+        self.lcd[RadioPanelLcd.LCD4] = RadioPanel.LCD_BLANK
+        self.update_displays()
 
     def set_lcd1(self, str):
         self.set_lcd(RadioPanelLcd.LCD1, str)
+
+    def set_lcd2(self, str):
+        self.set_lcd(RadioPanelLcd.LCD2, str)
+
+    def set_lcd3(self, str):
+        self.set_lcd(RadioPanelLcd.LCD3, str)
+
+    def set_lcd4(self, str):
+        self.set_lcd(RadioPanelLcd.LCD4, str)
 
 
     def update_displays(self):
