@@ -1,7 +1,7 @@
 import signal
 import sys
 import time
-import threading
+from threading import Thread
 
 
 class PanelController():
@@ -16,14 +16,15 @@ class PanelController():
         signal.signal(signal.SIGTERM, self.handle_close_signal)
 
     def append(self, panel):
-        self.panels.append(panel(is_verbose()))
+        panel.verbose = is_verbose()
+        self.panels.append(panel)
 
     def start_all(self):
-        for p in self.panels:
-            p.connect()
-            if p.device_is_ready:
-                thread = threading.Thread(target=p.monitor_device)
-                thread.start()
+        for panel in self.panels:
+            panel.connect()
+            if panel.device_is_ready:
+                Thread(target=panel.monitor_usb_device).start()
+                Thread(target=panel.service.run).start()
 
     def wait(self):
         print('Press Ctrl+C to exit')

@@ -20,6 +20,7 @@ class PanelBase(object):
         self.connect()
 
     def close(self):
+        print("Closing " + self.device_name())
         self.stop = True  
 
     def connect(self):
@@ -30,17 +31,17 @@ class PanelBase(object):
         for device in devices:
             if device is not None:
                 if self.usb_bus == device.bus and self.usb_address == device.address:
-                    self.connect_device(
+                    self.connect_usb_device(
                         device, "Connecting to specified USB device: " + self.device_name(device))
                     return
                 elif self.usb_bus == None or self.usb_address == None:
-                    self.connect_device(
+                    self.connect_usb_device(
                         device, "Connecting to first available USB device: " + self.device_name(device))
                     return
                 else:
                     print(self.device_name(device) + " skipped.")
 
-    def connect_device(self, device, message):
+    def connect_usb_device(self, device, message):
         """
         Connects, starts and spins up a thread for listening to the device.
         """
@@ -53,7 +54,7 @@ class PanelBase(object):
         print(self.device_name() + " connected. Starting monitoring.")
 
 
-    def monitor_device(self):
+    def monitor_usb_device(self):
         """
         Loops over the device, calling self.read_from_device() to read any new data using self.device.read().
         """        

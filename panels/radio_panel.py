@@ -11,11 +11,17 @@ class RadioPanel(PanelBase):
     USB_VENDOR = 0x06a3 # Logitech
     USB_PRODUCT = 0x0d05 # Radio Panel
 
-    def __init__(self, usb_bus=None, usb_address=None, verbose=True):
+    def __init__(self, service, usb_bus=None, usb_address=None, verbose=True):
 
         super().__init__(RadioPanel.USB_VENDOR, RadioPanel.USB_PRODUCT, usb_bus, usb_address, verbose)
-        self.button_state = 0
         self.action_mapping = None
+        self.service = service
+        self.service.connect_panel(self)
+        self.button_state = 0
+
+    def close(self):
+        PanelBase.close(self)
+        self.service.close()
 
     def map_actions(self, action_mapping):
         self.action_mapping = action_mapping
