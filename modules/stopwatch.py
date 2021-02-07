@@ -4,9 +4,11 @@ class RadioPanelStopWatch:
     def __init__(self, should_restart_immediatly=False, should_reset_to_zero=False):
         self.is_running = False
         self.is_reset = False
+        self.stop_watch_start_time = None
         self.should_reset_to_zero = should_reset_to_zero
         self.should_restart_immediatly = should_restart_immediatly
-        self.start_time = time.time()   
+        self.start_time = time.time()  
+        self.time_diff = 0 
         self.is_closing = False
         self.display = None 
         self.timer = None
@@ -40,8 +42,12 @@ class RadioPanelStopWatch:
 
 
     def update_stop_watch(self):
-        time_diff = time.time() - self.stop_watch_start_time
-        self.display(time_convert(time_diff))
+        if self.stop_watch_start_time is None:
+            self.time_diff = 0
+        else:
+            self.time_diff = time.time() - self.stop_watch_start_time
+        if self.lcd_handler is not None:
+            self.lcd_handler(time_convert(self.time_diff))
 
         self.timer = threading.Timer(1.0, self.update_stop_watch)
         self.timer.start()
